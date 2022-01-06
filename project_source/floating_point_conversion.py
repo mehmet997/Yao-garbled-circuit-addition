@@ -96,21 +96,6 @@ def binaryToDecimal(binary, length):
     return ans
 
 
-# Driver code :
-if __name__ == "__main__":
-    n = "110.101"
-    print(binaryToDecimal(n, len(n)))
-
-    n = "101.1101"
-    print(binaryToDecimal(n, len(n)))
-
-
-# This code is contributed
-# by aishwarya.27
-
-
-
-
 # from here: own code
 
 def float_normalization(n):
@@ -135,26 +120,11 @@ def float_normalization(n):
     result = float_nr.replace('.', '')
     return result
 
+
 def reverse_float_normalization(n):
     # the result of the addition has one bit more than the inputs, so we have exponent 2^5 now
     # --> shift by 5 digits to convert back
-    #print(n)
     n = n[:5] + '.' + n[5:]
-    #print(n)
     n = binaryToDecimal(n, len(n))
-    n = round(n,1)
+    n = round(n, 1)
     return n
-
-# for testing the methods here
-n = 30
-print(str(n))
-result = float_normalization(n)
-print("as bit representation (without dot) : " + result)
-
-result = result.zfill(11)
-
-reversed_result = reverse_float_normalization(result)
-
-
-print("adding the dot on the right place again: " + str(reversed_result))
-

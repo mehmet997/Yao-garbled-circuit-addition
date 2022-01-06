@@ -47,7 +47,6 @@ class Bob:
         garbled_tables = entry["garbled_tables"]
         a_wires = circuit.get("alice", [])  # list of Alice's wires
         b_wires = circuit.get("bob", [])  # list of Bob's wires
-        N = len(a_wires) + len(b_wires)
 
         print(f"Received {circuit['id']}")
 

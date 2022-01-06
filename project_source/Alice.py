@@ -39,13 +39,11 @@ class Alice(YaoGarbler):
             }
             logging.debug(f"Sending {circuit['circuit']['id']}")
 
-            answer = self.socket.send_wait(to_send)
+            self.socket.send_wait(to_send)
 
             """ OWN CHANGES: """
             with open('circuit_and_garbled_table.txt', 'a') as file:
                 print(to_send, file=file)
-            # reading it back in:
-            # with open('circuit_and_garbled_table.txt', 'r') as f: content = f.read(); dic = eval(content);
 
     def send_alice_values(self):
         all_b_keys = []
@@ -56,7 +54,6 @@ class Alice(YaoGarbler):
                         entry: A dict representing the circuit to evaluate.
                     """
             circuit, pbits, keys = entry["circuit"], entry["pbits"], entry["keys"]
-            outputs = circuit["out"]
             a_wires = circuit.get("alice", [])  # Alice's wires
             a_inputs = {}  # map from Alice's wires to (key, encr_bit) inputs
             b_wires = circuit.get("bob", [])  # Bob's wires
@@ -70,10 +67,6 @@ class Alice(YaoGarbler):
             print(f"======== {circuit['id']} ========")
 
             """OWN CHANGES: only one input from alice:"""
-
-            # Generate all inputs for both Alice and Bob
-            # for bits in [format(n, 'b').zfill(N) for n in range(2**N)]:
-            #    bits_a = [int(b) for b in bits[:len(a_wires)]]  # Alice's inputs
 
             # Map Alice's wires to (key, encr_bit)
             for i in range(len(a_wires)):
@@ -91,37 +84,13 @@ class Alice(YaoGarbler):
         for entry in self.circuits:
             circuit, pbits, keys = entry["circuit"], entry["pbits"], entry["keys"]
             result = self.ot.alice_ot_part(b_keys)
-            string_ints = [str(int) for int in self.bits_a]
-            str_bits_a = "".join(string_ints)
-            # str_bits_a = ' '.join(bits_a)
-            # str_bits_b = ' '.join(bits[len(a_wires):])
             outputs = circuit["out"]
-            a_wires = circuit.get("alice", [])
             str_result = ' '.join([str(result[w]) for w in outputs])
             results.append(str_result)
-            #print(f"  Alice{a_wires} = {str_bits_a} "
-            #      # f"Bob{b_wires} = {str_bits_b}  "
-            #      f"Outputs{outputs} = {str_result}")
         self.socket.send("TERMINATE")
         return results
 
 
-
-    #def print(self, entry):
-
-
-        # Format output
-        #string_ints = [str(int) for int in self.bits_a]
-        #str_bits_a = "".join(string_ints)
-        ## str_bits_a = ' '.join(bits_a)
-        # str_bits_b = ' '.join(bits[len(a_wires):])
-        #str_result = ' '.join([str(result[w]) for w in outputs])
-
-        #print(f"  Alice{a_wires} = {str_bits_a} "
-        #      # f"Bob{b_wires} = {str_bits_b}  "
-        #      f"Outputs{outputs} = {str_result}")
-
-        #return
 
     def _get_encr_bits(self, pbit, key0, key1):
         return ((key0, 0 ^ pbit), (key1, 1 ^ pbit))

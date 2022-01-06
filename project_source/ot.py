@@ -28,7 +28,6 @@ class ObliviousTransfer:
             print(a_inputs, file=file)
 
         self.socket.send(a_inputs)
-        #self.socket.send_wait("TERMINATE")
 
 
     def alice_ot_part(self, b_keys):
@@ -50,8 +49,8 @@ class ObliviousTransfer:
             logging.debug(f"Sending gate ID {w}")
             with open('bob_ot.txt', 'a') as file:
                 print("Sending gate ID"+str(w), file=file)
-            answer = self.socket.send_wait(w)
-            print(answer)
+            self.socket.send(w)
+
 
     def send_result(self, circuit, g_tables, pbits_out, b_inputs):
         """Evaluate circuit and send the result to Alice.

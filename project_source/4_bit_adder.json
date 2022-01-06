@@ -1,0 +1,38 @@
+{
+  "name": "4-bit-adder",
+  "circuits": [
+    {
+      "id": "4-bit-adder",
+      "alice": [1, 2, 3, 4],
+      "bob": [5, 6, 7, 8],
+      "out": [27, 24, 19, 14, 10],
+      "gates": [
+
+        {"id": 9, "type": "AND", "in": [4, 8]},
+        {"id": 10, "type": "XOR", "in": [4, 8]},
+        {"id": 11, "type": "AND", "in": [9, 10]},
+        {"id": 12, "type": "OR", "in": [9, 11]},
+
+        {"id": 13, "type": "XOR", "in": [3, 7]},
+        {"id": 14, "type": "XOR", "in": [12, 13]},
+        {"id": 15, "type": "AND", "in": [12, 13]},
+        {"id": 16, "type": "AND", "in": [3, 7]},
+        {"id": 17, "type": "OR", "in": [15, 16]},
+
+        {"id": 18, "type": "XOR", "in": [2, 6]},
+        {"id": 19, "type": "XOR", "in": [17, 18]},
+        {"id": 20, "type": "AND", "in": [17, 18]},
+        {"id": 21, "type": "AND", "in": [2, 6]},
+        {"id": 22, "type": "OR", "in": [20, 21]},
+
+        {"id": 23, "type": "XOR", "in": [1, 5]},
+        {"id": 24, "type": "XOR", "in": [22, 23]},
+        {"id": 25, "type": "AND", "in": [22, 23]},
+        {"id": 26, "type": "AND", "in": [1, 5]},
+        {"id": 27, "type": "OR", "in": [25, 26]}
+
+      ]
+    }
+
+  ]
+}

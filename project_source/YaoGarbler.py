@@ -28,6 +28,6 @@ class YaoGarbler(ABC):
             }
             self.circuits.append(entry)
 
-    @abstractmethod
-    def start(self):
-        pass
+    #@abstractmethod
+    #def start(self):
+    #    pass

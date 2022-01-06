@@ -10,7 +10,7 @@ class ObliviousTransfer:
         self.socket = socket
         self.enabled = enabled
 
-    def get_result(self, a_inputs, b_keys):
+    def send_alice_inputs_encrypted(self, a_inputs):
         """Send Alice's inputs and retrieve Bob's result of evaluation.
 
         Args:
@@ -28,11 +28,14 @@ class ObliviousTransfer:
             print(a_inputs, file=file)
 
         self.socket.send(a_inputs)
+        #self.socket.send_wait("TERMINATE")
 
+
+    def alice_ot_part(self, b_keys):
         for _ in range(len(b_keys)):
             w = self.socket.receive()  # receive gate ID where to perform OT
             logging.debug(f"Received gate ID {w}")
-            """TODO: Hier weiter machen! """
+            
             if self.enabled:  # perform oblivious transfer
                 pair = (pickle.dumps(b_keys[w][0]), pickle.dumps(b_keys[w][1]))
                 self.ot_garbler(pair)
@@ -41,6 +44,14 @@ class ObliviousTransfer:
                 self.socket.send(to_send)
 
         return self.socket.receive()
+
+    def bob_ot_part(self, circuit, b_inputs):
+        for w, b_input in b_inputs.items():
+            logging.debug(f"Sending gate ID {w}")
+            with open('bob_ot.txt', 'a') as file:
+                print("Sending gate ID"+str(w), file=file)
+            answer = self.socket.send_wait(w)
+            print(answer)
 
     def send_result(self, circuit, g_tables, pbits_out, b_inputs):
         """Evaluate circuit and send the result to Alice.

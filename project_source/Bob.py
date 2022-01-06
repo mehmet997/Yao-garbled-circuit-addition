@@ -35,6 +35,7 @@ class Bob:
                 logging.info("Stop listening")
                 break
 
+
     def send_evaluation(self, entry):
         """Evaluate yao circuit for all Bob and Alice's inputs and
         send back the results.

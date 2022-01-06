@@ -21,9 +21,6 @@ def calculate_sum(inputs):
     return result
 
 def binary_string_to_integer_list(inputs):
-    #result = "{0:b}".format(inputs)
-    #result = format(result, '#06b')
-    #result = result[2:]
     a_list = [char for char in inputs]
     map_object = map(int, a_list)
     list_of_integers = list(map_object)
@@ -36,14 +33,28 @@ def print_alice_to_bob(circuit_path,inputs_a,inputs_b):
     bob_thread.start()
 
 
+
     time.sleep(1)
     circuit_path = os.path.dirname(__file__)+"/"+circuit_path
     alice = Alice(inputs_a, circuit_path)
-    alice_thread = threading.Thread(target=alice.start)
-    alice_thread.start()
+    #alice_thread = threading.Thread(target=alice.send_circuit_and_garbled_table)
+    #alice_thread.start()
+    alice.send_circuit_and_garbled_table()
+    b_keys = alice.send_alice_values()[0]
+    return alice, b_keys
 
-def alice_bob_OT():
-    pass
+
+def alice_bob_OT(alice, b_keys):
+    """performs OT between Alice and Bob, Bob's thread is still running, so only starting alices ot part here
+    this will result in a print of the following 3 files:
+    - alice_keys_and_external_values
+    - alice_ot
+    - bob_ot
+    """
+    result = alice.alice_ot(b_keys)
+    print(result)
+
+
 
 
 def bob_mpc_compute(bobs_data_input):
@@ -99,13 +110,13 @@ def main(circuit_path,alice_inputs,bob_inputs):
     # This output from Alice should be printed in a file e.g. file_name
     # The output format and how to read it should be described in the report document.
     # E.g. if you want to output in table format then describe how to read and interpret the tables. 
-    print_alice_to_bob(circuit_path,inputs_a,inputs_b)
-    print("result: ",floating_point_conversion.reverse_float_normalization("01111111001"))
+    alice, b_keys = print_alice_to_bob(circuit_path,inputs_a,inputs_b)
+    #print("result: ",floating_point_conversion.reverse_float_normalization("01111111001"))
 
     #
     # Alice and Bob OT
     # This function should print (in a file/console) the OT between Alice and Bob that takes place in Yao's protocol
-    #alice_bob_OT()
+    alice_bob_OT(alice, b_keys)
 
     # This function should print the output the function that Bob wants to compute on the combined data
     # For example this could be one of the three functions decribed in the project slide
@@ -136,7 +147,7 @@ if __name__ == '__main__':
         parser.add_argument("-a",
                             "--alice_input",
                             metavar="alice_input",
-                            default="0",
+                            default="15",
                             help="The input of Alice (in form [input1, input2, input3, ...]) ")
         parser.add_argument("-b",
                             "--bob_input",

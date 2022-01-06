@@ -29,7 +29,7 @@ class Alice(YaoGarbler):
         self.socket = util.GarblerSocket()
         self.ot = ot.ObliviousTransfer(self.socket, enabled=oblivious_transfer)
 
-    def start(self):
+    def send_circuit_and_garbled_table(self):
         """Start Yao protocol."""
         for circuit in self.circuits:
             to_send = {
@@ -39,65 +39,89 @@ class Alice(YaoGarbler):
             }
             logging.debug(f"Sending {circuit['circuit']['id']}")
 
+            answer = self.socket.send_wait(to_send)
+
             """ OWN CHANGES: """
-            with open('alice_to_bob.txt', 'a') as file:
+            with open('circuit_and_garbled_table.txt', 'a') as file:
                 print(to_send, file=file)
             # reading it back in:
-            # with open('alice_to_bob.txt', 'r') as f: content = f.read(); dic = eval(content);
+            # with open('circuit_and_garbled_table.txt', 'r') as f: content = f.read(); dic = eval(content);
 
-            self.socket.send_wait(to_send)
-            # print the to_send to a file
+    def send_alice_values(self):
+        all_b_keys = []
+        for entry in self.circuits:
+            """Print circuit evaluation for all Bob and Alice inputs.
 
-            self.print(circuit)
-            self.socket.send("TERMINATE")
-            return
+                    Args:
+                        entry: A dict representing the circuit to evaluate.
+                    """
+            circuit, pbits, keys = entry["circuit"], entry["pbits"], entry["keys"]
+            outputs = circuit["out"]
+            a_wires = circuit.get("alice", [])  # Alice's wires
+            a_inputs = {}  # map from Alice's wires to (key, encr_bit) inputs
+            b_wires = circuit.get("bob", [])  # Bob's wires
+            b_keys = {  # map from Bob's wires to a pair (key, encr_bit)
+                w: self._get_encr_bits(pbits[w], key0, key1)
+                for w, (key0, key1) in keys.items() if w in b_wires
+            }
 
-    def print(self, entry):
-        """Print circuit evaluation for all Bob and Alice inputs.
+            N = len(a_wires) + len(b_wires)
 
-        Args:
-            entry: A dict representing the circuit to evaluate.
-        """
-        circuit, pbits, keys = entry["circuit"], entry["pbits"], entry["keys"]
-        outputs = circuit["out"]
-        a_wires = circuit.get("alice", [])  # Alice's wires
-        a_inputs = {}  # map from Alice's wires to (key, encr_bit) inputs
-        b_wires = circuit.get("bob", [])  # Bob's wires
-        b_keys = {  # map from Bob's wires to a pair (key, encr_bit)
-            w: self._get_encr_bits(pbits[w], key0, key1)
-            for w, (key0, key1) in keys.items() if w in b_wires
-        }
+            print(f"======== {circuit['id']} ========")
 
-        N = len(a_wires) + len(b_wires)
+            """OWN CHANGES: only one input from alice:"""
 
-        print(f"======== {circuit['id']} ========")
+            # Generate all inputs for both Alice and Bob
+            # for bits in [format(n, 'b').zfill(N) for n in range(2**N)]:
+            #    bits_a = [int(b) for b in bits[:len(a_wires)]]  # Alice's inputs
 
-        """OWN CHANGES: only one input from alice:"""
+            # Map Alice's wires to (key, encr_bit)
+            for i in range(len(a_wires)):
+                a_inputs[a_wires[i]] = (keys[a_wires[i]][self.bits_a[i]],
+                                        pbits[a_wires[i]] ^ self.bits_a[i])
 
-        # Generate all inputs for both Alice and Bob
-        # for bits in [format(n, 'b').zfill(N) for n in range(2**N)]:
-        #    bits_a = [int(b) for b in bits[:len(a_wires)]]  # Alice's inputs
+            # Send Alice's encrypted inputs and keys to Bob
+            self.ot.send_alice_inputs_encrypted(a_inputs)
+            all_b_keys.append(b_keys)
 
-        # Map Alice's wires to (key, encr_bit)
-        for i in range(len(a_wires)):
-            a_inputs[a_wires[i]] = (keys[a_wires[i]][self.bits_a[i]],
-                                    pbits[a_wires[i]] ^ self.bits_a[i])
+        return all_b_keys
 
-        # Send Alice's encrypted inputs and keys to Bob
-        result = self.ot.get_result(a_inputs, b_keys)
+    def alice_ot(self, b_keys):
+        results = []
+        for entry in self.circuits:
+            circuit, pbits, keys = entry["circuit"], entry["pbits"], entry["keys"]
+            result = self.ot.alice_ot_part(b_keys)
+            string_ints = [str(int) for int in self.bits_a]
+            str_bits_a = "".join(string_ints)
+            # str_bits_a = ' '.join(bits_a)
+            # str_bits_b = ' '.join(bits[len(a_wires):])
+            outputs = circuit["out"]
+            a_wires = circuit.get("alice", [])
+            str_result = ' '.join([str(result[w]) for w in outputs])
+            results.append(str_result)
+            #print(f"  Alice{a_wires} = {str_bits_a} "
+            #      # f"Bob{b_wires} = {str_bits_b}  "
+            #      f"Outputs{outputs} = {str_result}")
+        self.socket.send("TERMINATE")
+        return results
+
+
+
+    #def print(self, entry):
+
 
         # Format output
-        string_ints = [str(int) for int in self.bits_a]
-        str_bits_a = "".join(string_ints)
-        # str_bits_a = ' '.join(bits_a)
+        #string_ints = [str(int) for int in self.bits_a]
+        #str_bits_a = "".join(string_ints)
+        ## str_bits_a = ' '.join(bits_a)
         # str_bits_b = ' '.join(bits[len(a_wires):])
-        str_result = ' '.join([str(result[w]) for w in outputs])
+        #str_result = ' '.join([str(result[w]) for w in outputs])
 
-        print(f"  Alice{a_wires} = {str_bits_a} "
-              # f"Bob{b_wires} = {str_bits_b}  "
-              f"Outputs{outputs} = {str_result}")
+        #print(f"  Alice{a_wires} = {str_bits_a} "
+        #      # f"Bob{b_wires} = {str_bits_b}  "
+        #      f"Outputs{outputs} = {str_result}")
 
-        return
+        #return
 
     def _get_encr_bits(self, pbit, key0, key1):
         return ((key0, 0 ^ pbit), (key1, 1 ^ pbit))

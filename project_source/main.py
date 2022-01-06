@@ -18,19 +18,10 @@ def calculate_sum(inputs):
     result = 0
     for input in inputs:
         result = result + input
-    if result > 15:
-        raise ValueError("sums of inputs of alice and bob each must be 4 bits")
+    if result > 15.9 or result < 0:
+        raise ValueError("sums of inputs of alice and bob each must be 0 <= sum <= 15.9")
 
     return result
-    #result = "{0:b}".format(result)
-    #result = format(result, '#06b')
-    #result = result[2:]
-    #a_list = [char for char in result]
-    #map_object = map(int, a_list)
-    #list_of_integers = list(map_object)
-    #return list_of_integers
-
-
 
 
 class Bob:
@@ -54,6 +45,8 @@ class Bob:
         while True:
             try:
                 entry = self.socket.receive()
+                if entry == "TERMINATE":
+                    break
                 self.socket.send(True)
                 self.send_evaluation(entry)
             except KeyboardInterrupt:
@@ -132,6 +125,7 @@ class Alice(YaoGarbler):
             # print the to_send to a file
 
             self.print(circuit)
+            self.socket.send("TERMINATE")
             return
 
     def print(self, entry):
@@ -219,10 +213,10 @@ def verfiy_output():
 def main(circuit_path,inputs_a,inputs_b):
 
     inputs_a = inputs_a.split(",")
-    inputs_a = map(int, inputs_a)
+    inputs_a = map(float, inputs_a)
     inputs_a = list(inputs_a)
     inputs_b = inputs_b.split(",")
-    inputs_b = map(int, inputs_b)
+    inputs_b = map(float, inputs_b)
     inputs_b = list(inputs_b)
 
     result = 0
@@ -231,12 +225,12 @@ def main(circuit_path,inputs_a,inputs_b):
     for input in inputs_b:
         result = result + input
 
-    result = format(result, '#06b')
-    result = result[2:]
-    a_list = [char for char in result]
-    map_object = map(int, a_list)
-    list_of_integers = list(map_object)
-    print("expected result:", list_of_integers)
+    #result = format(result, '#06b')
+    #result = result[2:]
+    #a_list = [char for char in result]
+    #map_object = map(int, a_list)
+    #list_of_integers = list(map_object)
+    print("expected result:", result)
     """ If we need the sum of all inputs of both alice and bob: """
     # 1. alice calculates her sum -> this must be 4 bits result
     inputs_a = calculate_sum(inputs_a)
@@ -262,7 +256,7 @@ def main(circuit_path,inputs_a,inputs_b):
     # The output format and how to read it should be described in the report document.
     # E.g. if you want to output in table format then describe how to read and interpret the tables. 
     print_alice_to_bob(circuit_path,inputs_a,inputs_b)
-    print(floating_point_conversion.reverse_float_normalization("10101000000"))
+    print("result: ",floating_point_conversion.reverse_float_normalization("01111111001"))
 
     #
     # Alice and Bob OT
@@ -305,12 +299,12 @@ if __name__ == '__main__':
         parser.add_argument("-a",
                             "--alice_input",
                             metavar="alice_input",
-                            default="1, 2, 3",
+                            default="0",
                             help="The input of Alice (in form [input1, input2, input3, ...]) ")
         parser.add_argument("-b",
                             "--bob_input",
                             metavar="bob_input",
-                            default="4, 5, 6",
+                            default="15.9",
                             help="The input of Bob (in form [input1, input2, input3, ...]) ")
 
         main(circuit_path=parser.parse_args().circuit,

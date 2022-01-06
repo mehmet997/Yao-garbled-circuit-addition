@@ -146,7 +146,7 @@ def reverse_float_normalization(n):
     return n
 
 # for testing the methods here
-n = 9
+n = 30
 print(str(n))
 result = float_normalization(n)
 print("as bit representation (without dot) : " + result)

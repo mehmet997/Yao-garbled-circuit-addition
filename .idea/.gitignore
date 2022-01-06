@@ -6,12 +6,5 @@
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
-# Pycharm stuff
-/.idea/
 
-# text files
-/project_source/alice_keys_and_external_values.txt
-/project_source/alice_ot.txt
-/project_source/bob_ot.txt
-/project_source/alice_to_bob.txt
 

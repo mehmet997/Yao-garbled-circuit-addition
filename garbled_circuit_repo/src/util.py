@@ -1,3 +1,6 @@
+# this file is from https://github.com/ojroques/garbled-circuit
+# we only added the __str__ method for printing Prime_Group Objects into files
+
 import json
 import operator
 import random

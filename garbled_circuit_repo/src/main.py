@@ -1,8 +1,10 @@
+# this file is from https://github.com/ojroques/garbled-circuit
+# NOTE: this file is no longer used in our project
 #!/usr/bin/env python3
 import logging
-import garbled_circuit_repo.src.ot as ot
-import garbled_circuit_repo.src.util as util
-import garbled_circuit_repo.src.yao as yao
+import ot
+import util
+import yao
 from abc import ABC, abstractmethod
 
 logging.basicConfig(format="[%(levelname)s] %(message)s",

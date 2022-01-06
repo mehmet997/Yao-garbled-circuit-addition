@@ -1,11 +1,8 @@
-# this file is from https://github.com/ojroques/garbled-circuit
-# NOTE: this file is no longer used in our project
-
 import hashlib
 import logging
 import pickle
-import util
-import yao
+import garbled_circuit_repo.src.util as util
+import garbled_circuit_repo.src.yao as yao
 
 
 class ObliviousTransfer:
@@ -24,12 +21,18 @@ class ObliviousTransfer:
             The result of the yao circuit evaluation.
         """
         logging.debug("Sending inputs to Bob")
+
+        """ OWN CHANGES: PRINT OT FROM ALICES SIDE"""
+        # print ot: alices inputs (her keys and external values) for ot:
+        with open('alice_keys_and_external_values.txt', 'a') as file:
+            print(a_inputs, file=file)
+
         self.socket.send(a_inputs)
 
         for _ in range(len(b_keys)):
             w = self.socket.receive()  # receive gate ID where to perform OT
             logging.debug(f"Received gate ID {w}")
-
+            """TODO: Hier weiter machen! """
             if self.enabled:  # perform oblivious transfer
                 pair = (pickle.dumps(b_keys[w][0]), pickle.dumps(b_keys[w][1]))
                 self.ot_garbler(pair)
@@ -57,6 +60,8 @@ class ObliviousTransfer:
 
         for w, b_input in b_inputs.items():
             logging.debug(f"Sending gate ID {w}")
+            with open('bob_ot.txt', 'a') as file:
+                print("Sending gate ID"+str(w), file=file)
             self.socket.send(w)
 
             if self.enabled:
@@ -83,8 +88,10 @@ class ObliviousTransfer:
         self.socket.send_wait(G)
 
         # OT protocol based on Nigel Smart’s "Cryptography Made Simple"
+        # Alice chooses a random c from Group G using its generator ... c is now sent to B...
         c = G.gen_pow(G.rand_int())
         h0 = self.socket.send_wait(c)
+
         h1 = G.mul(c, G.inv(h0))
         k = G.rand_int()
         c1 = G.gen_pow(k)
@@ -92,6 +99,11 @@ class ObliviousTransfer:
         e1 = util.xor_bytes(msgs[1], self.ot_hash(G.pow(h1, k), len(msgs[1])))
 
         self.socket.send((c1, e0, e1))
+        with open('alice_ot.txt', 'a') as file:
+            print("Group G:", G, file=file)
+            print("random c from Group G:", c, file=file)
+            print("(c1, e0, e1): ", (c1, e0, e1), file=file)
+            print("OT protocol ended", file=file)
         logging.debug("OT protocol ended")
 
     def ot_evaluator(self, b):
@@ -113,6 +125,8 @@ class ObliviousTransfer:
         x_pow = G.gen_pow(x)
         h = (x_pow, G.mul(c, G.inv(x_pow)))
         c1, e0, e1 = self.socket.send_wait(h[b])
+        with open('bob_ot.txt', 'a') as file:
+            print("h:", h[b], file=file)
         e = (e0, e1)
         ot_hash = self.ot_hash(G.pow(c1, x), len(e[b]))
         mb = util.xor_bytes(e[b], ot_hash)

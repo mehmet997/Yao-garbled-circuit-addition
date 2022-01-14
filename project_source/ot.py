@@ -69,9 +69,9 @@ class ObliviousTransfer:
         logging.debug("Received Alice's inputs")
 
         for w, b_input in b_inputs.items():
-            logging.debug(f"Sending gate ID {w}")
+            logging.debug(f"Sending wire ID {w}")
             with open('bob_ot.txt', 'a') as file:
-                print("Sending gate ID"+str(w), file=file)
+                print("Sending wire ID"+str(w), file=file)
             self.socket.send(w)
 
             if self.enabled:

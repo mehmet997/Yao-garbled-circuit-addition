@@ -42,7 +42,7 @@ def binary_string_to_integer_list(inputs):
 def print_alice_to_bob(circuit_path, inputs_a):
     """
     This function prints the necessary output from Alice that she wants to send to Bob. Also prints
-    to file circuit_and_garbled_table.txt
+    to file circuit_and_garbled_table_and_p_z.txt, also prints alices inputs to alice_keys_and_external_values.txt
     :param circuit_path: the path where the circuit json is saved
     :param inputs_a: Alices inputs, use here the result of alice_mpc_compute()
     :return: returns the alice object (for further usage) and the keys that she generates for each wire for bob
@@ -59,8 +59,7 @@ def print_alice_to_bob(circuit_path, inputs_a):
 def alice_bob_ot(alice, b_keys):
     """
     performs OT between Alice and Bob, Bob's thread should be still running, so only starting alice's ot part here
-    this will result in a print of the following 3 files:
-    - alice_keys_and_external_values
+    this will result in a print of the following 2 files:
     - alice_ot
     - bob_ot
     :param alice: The alice object

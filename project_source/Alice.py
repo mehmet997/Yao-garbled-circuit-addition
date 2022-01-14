@@ -42,7 +42,7 @@ class Alice(YaoGarbler):
             self.socket.send_wait(to_send)
 
             """ OWN CHANGES: """
-            with open('circuit_and_garbled_table.txt', 'a') as file:
+            with open('circuit_and_garbled_table_and_p_z.txt', 'a') as file:
                 print(to_send, file=file)
 
     def send_alice_values(self):

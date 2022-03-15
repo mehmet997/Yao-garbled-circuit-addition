@@ -8,9 +8,15 @@ import threading
 import os
 import floating_point_conversion
 
-from project_source.Alice import Alice
-from project_source.Bob import Bob
+try:
+    from project_source.Alice import Alice
+except:
+    from Alice import Alice
 
+try:
+    from project_source.Bob import Bob
+except:
+    from Bob import Bob
 
 def calculate_sum(inputs):
     """
@@ -157,6 +163,7 @@ def main(circuit_path, alice_inputs, bob_inputs):
     else:
         print("Wrong solution.")
     print("---THE END---")
+    bob_thread.join()
 
 
 # Press the green button in the gutter to run the script.

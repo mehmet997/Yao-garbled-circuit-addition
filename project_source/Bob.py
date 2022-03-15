@@ -1,7 +1,22 @@
 # the code of this file is from https://github.com/ojroques/garbled-circuit
 # we modified it to fit our needs for the project
-import garbled_circuit_repo.src.util as util
-import project_source.ot as ot
+
+try:
+    import project_source.ot as ot
+except:
+    import ot as ot
+
+
+
+import sys
+sys.path.append('../garbled_circuit_repo/src')
+
+try:
+    import garbled_circuit_repo.src.util as util
+except:
+    import util as util
+
+
 import logging
 
 

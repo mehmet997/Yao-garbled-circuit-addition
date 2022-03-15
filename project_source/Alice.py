@@ -1,7 +1,21 @@
 # the code of this file is from https://github.com/ojroques/garbled-circuit
 # we modified it to fit our needs for the project
-import garbled_circuit_repo.src.util as util
-import project_source.ot as ot
+
+
+import sys
+
+sys.path.append('../garbled_circuit_repo/src')
+
+try:
+    import garbled_circuit_repo.src.util as util
+except:
+    import util as util
+
+try:
+    import project_source.ot as ot
+except:
+    import ot as ot
+
 import logging
 from YaoGarbler import YaoGarbler
 
@@ -89,8 +103,6 @@ class Alice(YaoGarbler):
             results.append(str_result)
         self.socket.send("TERMINATE")
         return results
-
-
 
     def _get_encr_bits(self, pbit, key0, key1):
         return ((key0, 0 ^ pbit), (key1, 1 ^ pbit))

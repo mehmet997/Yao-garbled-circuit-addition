@@ -1,8 +1,21 @@
 # the code of this file is from https://github.com/ojroques/garbled-circuit
 # we modified it to fit our needs for the project
 
-import garbled_circuit_repo.src.util as util
-import garbled_circuit_repo.src.yao as yao
+
+
+import sys
+sys.path.append('../garbled_circuit_repo/src')
+
+try:
+    import garbled_circuit_repo.src.util as util
+except:
+    import util as util
+
+try:
+    import garbled_circuit_repo.src.yao as yao
+except:
+    import yao as yao
+
 from abc import ABC, abstractmethod
 
 

@@ -47,3 +47,8 @@ The following diagram shows how the communication is working:
 
 <img width="534" alt="Screenshot 2022-06-22 at 09 29 11" src="https://user-images.githubusercontent.com/63359071/174971235-c8753494-d941-4989-9f06-c84eac60c0c7.png">
 
+# Collaboration
+This project was developed as a team. 
+Authors: 
+- Mehmet Daglioglu (https://github.com/mehmet997)
+- Nina Suette (https://github.com/ninasuette)
